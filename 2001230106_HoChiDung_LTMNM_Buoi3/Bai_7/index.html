@@ -1,0 +1,23 @@
+<input type="text" id="kw" placeholder="Nhập từ khóa">
+
+<button onclick="search()">Tìm kiếm</button>
+<ul id="result"></ul>
+<script>
+    // Trang tìm kiếm sản phẩm bằng từ khóa
+    // Gọi `search.php?q=...` và hiển thị kết quả dạng danh sách
+    function search() {
+        let q = document.getElementById("kw").value;
+        fetch('search.php?q=' + encodeURIComponent(q))
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById("result").innerHTML = data.map(p =>
+
+                    `<li>${p.name} - ${p.price}</li>`).join('');
+
+            })
+            .catch(err => {
+                document.getElementById("result").innerHTML = '<li>Lỗi khi tìm kiếm</li>';
+                console.error('Lỗi khi gọi search.php:', err);
+            });
+    }
+</script>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+
+<html>
+
+<body>
+
+    <!--
+        Bài: Chat đơn giản lưu file
+        Mô tả: Giao diện cho phép gửi tin nhắn lên `chat.php` (POST),
+        và tải toàn bộ tin nhắn bằng GET (JSON) để hiển thị trong textarea.
+        - `chat.php` lưu tin nhắn vào `chat.txt` và trả về danh sách tin nhắn.
+        - Trang tự làm mới mỗi 2 giây để cập nhật tin nhắn mới.
+    -->
+
+    <textarea id="chat" rows="10" cols="40" readonly></textarea>
+
+    <br>
+
+    <input type="text" id="msg" placeholder="Nhập tin nhắn">
+
+    <button onclick="send()">Gửi</button>
+
+    <script>
+        // Tải danh sách tin nhắn từ server và hiển thị
+        function loadChat() {
+            fetch("chat.php")
+                .then(res => res.json())
+                .then(data => {
+                    // Dán mỗi tin nhắn thành một dòng
+                    document.getElementById("chat").value = data.join("\n");
+                })
+                .catch(err => {
+                    console.error('Lỗi khi tải chat:', err);
+                });
+        }
+
+        // Gửi tin nhắn tới server
+        function send() {
+            let formData = new FormData();
+            formData.append("msg", document.getElementById("msg").value);
+
+            fetch("chat.php", {
+                method: "POST",
+                body: formData
+            })
+                .then(() => {
+                    // Xoá ô input sau khi gửi và tải lại chat
+                    document.getElementById("msg").value = "";
+                    loadChat();
+                })
+                .catch(err => {
+                    console.error('Lỗi khi gửi tin nhắn:', err);
+                });
+        }
+
+        // Tự cập nhật mỗi 2 giây
+        setInterval(loadChat, 2000);
+
+        // Hiển thị ngay khi mở
+        loadChat();
+
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>To-Do List</title>
+    <!-- CSS để trang đẹp -->
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        #task { padding: 8px; width: 300px; font-size: 16px; }
+        button { padding: 8px 15px; margin: 0 5px; background: #4CAF50; color: white; border: none; cursor: pointer; border-radius: 4px; }
+        button.del { background: #ff6666; }
+        ul { list-style: none; padding: 0; margin-top: 20px; }
+        li { margin: 10px 0; padding: 10px; background: #f0f0f0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <!-- Tiêu đề -->
+    <h1>📋 To-Do List</h1>
+    
+    <!-- Input để nhập công việc -->
+    <input id="task" placeholder="Nhập công việc...">
+    <!-- Button thêm công việc (gọi hàm addTask) -->
+    <button onclick="addTask()">➕ Thêm</button>
+    
+    <!-- Danh sách công việc sẽ hiển thị ở đây -->
+    <ul id="list"></ul>
+
+    <script>
+        // ========== BẮT ĐẦU ==========
+        // Khi trang vừa load, gọi hàm load() để lấy dữ liệu
+        load();
+
+        // ========== FUNCTION: LOAD ==========
+        // Tác dụng: Lấy dữ liệu từ server (todo.php)
+        function load() {
+            // Fetch = gửi request đến server
+            fetch("todo.php")
+                // .then(r => r.json()) = chờ response, chuyển thành JSON
+                .then(r => r.json())
+                // .then(show) = lấy data JSON và gửi vào hàm show()
+                .then(show);
+        }
+
+        // ========== FUNCTION: SHOW ==========
+        // Tác dụng: Hiển thị danh sách công việc từ dữ liệu
+        function show(data) {
+            // Khởi tạo biến html rỗng để build HTML
+            let html = "";
+            
+            // data.forEach() = duyệt qua từng item trong data
+            // t = công việc hiện tại, i = vị trí (0, 1, 2, ...)
+            data.forEach((t, i) => {
+                // Tạo style cho task: nếu done=true -> gạch chân
+                // Nếu false -> bình thường
+                html += `<li>
+                    <!-- Icon checkbox: click để toggle done -->
+                    <!-- ✅ = hoàn thành, ⬜ = chưa hoàn thành -->
+                    <span onclick="done(${i})" style="cursor:pointer; font-size:20px;">
+                        ${t.done ? "✅" : "⬜"}
+                    </span>
+                    
+                    <!-- Tên công việc, gạch chân nếu done=true -->
+                    <span style="${t.done ? 'text-decoration: line-through; color: #999;' : ''}">
+                        ${t.task}
+                    </span>
+                    
+                    <!-- Button xóa công việc -->
+                    <button class="del" onclick="del(${i})">Xóa</button>
+                </li>`;
+            });
+            
+            // Đổ HTML vào thẻ <ul id="list"> để hiển thị trên trang
+            document.getElementById("list").innerHTML = html;
+        }
+
+        // ========== FUNCTION: ADDTASK ==========
+        // Tác dụng: Thêm công việc mới
+        function addTask() {
+            // Lấy giá trị từ input và xóa khoảng trắng thừa (trim)
+            let task = document.getElementById("task").value.trim();
+            
+            // Kiểm tra: nếu task rỗng thì alert và return (thoát hàm)
+            if (!task) { 
+                alert("Nhập công việc!"); 
+                return; 
+            }
+            
+            // Tạo FormData để gửi dữ liệu
+            // FormData = dạng để gửi POST request
+            let fd = new FormData();
+            // append("key", "value") = thêm dữ liệu
+            // Gửi task với key="add"
+            fd.append("add", task);
+            
+            // Gửi POST request đến todo.php
+            fetch("todo.php", { method: "POST", body: fd })
+                // Chuyển response thành JSON
+                .then(r => r.json())
+                // d = data trả về từ server (danh sách cập nhật)
+                .then(d => {
+                    // Hiển thị lại danh sách
+                    show(d);
+                    // Xóa input field (để người dùng nhập công việc mới)
+                    document.getElementById("task").value = "";
+                });
+        }
+
+        // ========== FUNCTION: DONE ==========
+        // Tác dụng: Toggle trạng thái hoàn thành (click icon ✅/⬜)
+        function done(i) {
+            // i = vị trí của công việc (0, 1, 2, ...)
+            
+            // Tạo FormData
+            let fd = new FormData();
+            // Gửi vị trí i với key="done"
+            fd.append("done", i);
+            
+            // Gửi POST request
+            fetch("todo.php", { method: "POST", body: fd })
+                // Chuyển thành JSON và hiển thị lại
+                .then(r => r.json())
+                .then(show);
+        }
+
+        // ========== FUNCTION: DEL ==========
+        // Tác dụng: Xóa công việc
+        function del(i) {
+            // i = vị trí của công việc
+            
+            // confirm() = hộp thoại xác nhận
+            // Nếu click "Hủy" hoặc "No" thì return (thoát hàm, không xóa)
+            if (!confirm("Xóa?")) return;
+            
+            // Tạo FormData
+            let fd = new FormData();
+            // Gửi vị trí i với key="delete"
+            fd.append("delete", i);
+            
+            // Gửi POST request và hiển thị lại danh sách
+            fetch("todo.php", { method: "POST", body: fd })
+                .then(r => r.json())
+                .then(show);
+        }
+    </script>
+</body>
+</html>

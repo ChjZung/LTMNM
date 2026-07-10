@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+
+<html>
+
+<body>
+
+    <!--
+        Bài: Hiển thị thời tiết giả theo tên thành phố
+        Mô tả: Người dùng nhập tên thành phố, gọi `weather.php?city=...`
+        để lấy dữ liệu thời tiết (giả lập) và hiển thị.
+    -->
+
+    <input id="city" placeholder="Nhập tên thành phố">
+
+    <button onclick="getWeather()">Xem</button>
+
+    <div id="weather"></div>
+
+    <script>
+        // Gọi weather.php và hiển thị kết quả
+        function getWeather() {
+            let city = document.getElementById("city").value;
+            fetch("weather.php?city=" + encodeURIComponent(city))
+                .then(res => res.json())
+                .then(data => {
+                    // Nếu server trả dữ liệu rỗng, hiển thị thông báo
+                    if (!data || !data.temp) {
+                        document.getElementById("weather").innerHTML = `<p>Không có dữ liệu cho '${city}'</p>`;
+                        return;
+                    }
+
+                    document.getElementById("weather").innerHTML = `
+        <h3>${city}</h3>
+        <p>Nhiệt độ: ${data.temp}°C</p>
+        <p>${data.desc}</p>
+        `;
+                })
+                .catch(err => {
+                    document.getElementById("weather").innerHTML = '<p>Lỗi khi tải dữ liệu thời tiết</p>';
+                    console.error('Lỗi khi gọi weather.php:', err);
+                });
+        }
+
+    </script>
+
+</body>
+
+</html>

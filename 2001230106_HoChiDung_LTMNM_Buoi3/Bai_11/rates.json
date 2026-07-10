@@ -1,0 +1,17 @@
+[
+    {
+        "currency":"USD",
+        "rate":26000
+    },
+
+    {
+        "currency":"EUR",
+        "rate":30500
+    },
+
+    {
+        "currency":"JPY",
+        "rate":180
+    }
+
+]

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <!--
+        Bài: Gửi tên tới server và nhận lời chào
+        Mô tả: Người dùng nhập tên, bấm nút 'Gửi' sẽ gọi `hello.php` bằng POST.
+        - `hello.php` trả về chuỗi lời chào (đã escape) và hiển thị ở <p id="msg">.
+    -->
+    <input type="text" id="name">
+    <button onclick="sayHello()">Gửi</button>
+    <p id="msg"></p>
+    <script>
+        // Hàm gửi tên tới server và hiển thị phản hồi
+        function sayHello() {
+            let formData = new FormData();
+            // Lấy giá trị từ ô input có id "name"
+            formData.append('name', document.getElementById("name").value);
+
+            // Gọi hello.php bằng phương thức POST, body là FormData
+            fetch('hello.php', {
+                method: 'POST',
+                body: formData
+            })
+                // Nhận phản hồi dạng text
+                .then(res => res.text())
+                // Hiển thị vào thẻ <p id="msg">
+                .then(data => document.getElementById("msg").innerText = data)
+                // Bắt lỗi mạng
+                .catch(err => {
+                    document.getElementById("msg").innerText = 'Lỗi khi gửi dữ liệu';
+                    console.error('Lỗi khi gọi hello.php:', err);
+                });
+        }
+    </script>
+</body>
+
+</html>

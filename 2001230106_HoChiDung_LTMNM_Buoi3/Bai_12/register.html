@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Đăng ký tài khoản</title>
+  <!-- CSS cho giao diện đẹp -->
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 400px; margin: 30px auto; }
+    h2 { text-align: center; }
+    form { display: flex; flex-direction: column; }
+    input { margin: 8px 0; padding: 8px; }
+    button { padding: 10px; background: #28a745; color: white; border: none; cursor: pointer; }
+    button:hover { background: #218838; }
+    #msg { margin-top: 15px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <!-- Tiêu đề -->
+  <h2>📝 Đăng ký tài khoản</h2>
+  
+  <!-- Form đăng ký (id="regForm" để JS lấy) -->
+  <form id="regForm">
+    <!-- Input tên đăng nhập -->
+    <input type="text" id="username" placeholder="Tên đăng nhập" required>
+    
+    <!-- Input email -->
+    <input type="email" id="email" placeholder="Email" required>
+    
+    <!-- Input mật khẩu -->
+    <input type="password" id="password" placeholder="Mật khẩu" required>
+    
+    <!-- Input xác nhận mật khẩu -->
+    <input type="password" id="confirm" placeholder="Nhập lại mật khẩu" required>
+    
+    <!-- Button submit (type="submit" để kích hoạt onsubmit) -->
+    <button type="submit">Đăng ký</button>
+  </form>
+  
+  <!-- Hiển thị thông báo kết quả (success/error) -->
+  <p id="msg"></p>
+
+  <script>
+    // ========== JAVASCRIPT: XỬ LÝ FORM PHÍA CLIENT ==========
+    
+    // Lắng nghe sự kiện submit form
+    // onsubmit = khi user click button "Đăng ký"
+    document.getElementById("regForm").onsubmit = function(e) {
+      
+      // e.preventDefault() = ngăn form reload trang (submit mặc định)
+      e.preventDefault();
+      
+      // ========== LẤY GIÁ TRỊ TỪ CÁC INPUT ==========
+      // .value = lấy giá trị input
+      // .trim() = xóa khoảng trắng thừa
+      let user = document.getElementById("username").value.trim();
+      let email = document.getElementById("email").value.trim();
+      let pass = document.getElementById("password").value;
+      let confirm = document.getElementById("confirm").value;
+
+      // ========== VALIDATION JS (Kiểm tra phía client) ==========
+      
+      // Kiểm tra password >= 6 ký tự
+      if (pass.length < 6) {
+        document.getElementById("msg").innerText = "Mật khẩu phải >= 6 ký tự";
+        return;  // Dừng, không gửi
+      }
+      
+      // Kiểm tra confirm password = password
+      if (pass !== confirm) {
+        document.getElementById("msg").innerText = "Mật khẩu nhập lại không khớp";
+        return;  // Dừng, không gửi
+      }
+
+      // ========== GỬI DỮ LIỆU ĐẾN SERVER ==========
+      // Tạo FormData để gửi POST
+      let formData = new FormData();
+      formData.append("username", user);  // Thêm username
+      formData.append("email", email);    // Thêm email
+      formData.append("password", pass);  // Thêm password
+
+      // fetch() = gửi request
+      // method: "POST" = phương thức POST
+      // body: formData = gửi dữ liệu
+      fetch("register.php", {
+        method: "POST",
+        body: formData
+      })
+      // .then(res => res.text()) = nhận response từ server (dạng text)
+      .then(res => res.text())
+      // .then(data => {...}) = xử lý dữ liệu nhận về
+      .then(data => {
+        // Hiển thị kết quả từ server (thành công/lỗi)
+        document.getElementById("msg").innerText = data;
+      })
+      // .catch() = nếu có lỗi network
+      .catch(err => {
+        document.getElementById("msg").innerText = "Lỗi kết nối server";
+      });
+    };
+  </script>
+</body>
+</html>

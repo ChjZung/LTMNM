@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tỷ Giá Ngoại Tệ</title>
+    <!-- CSS trang đẹp -->
+    <style>
+        body { font-family: Arial; margin: 20px; background: #f5f5f5; }
+        h1 { color: #333; }
+        button { padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #45a049; }
+        table { border-collapse: collapse; margin-top: 20px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
+        th { background: #4CAF50; color: white; }
+        .error { color: red; padding: 10px; background: #ffe6e6; border-radius: 5px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <!-- Tiêu đề -->
+    <h1>💱 Bảng Tỷ Giá Ngoại Tệ</h1>
+    
+    <!-- Button để người dùng cập nhật ngay -->
+    <button onclick="loadRate()">🔄 Cập Nhật</button>
+    
+    <!-- Bảng hiển thị tỷ giá -->
+    <table border="1" id="tbl">
+        <tr><th>Tiền tệ</th><th>Tỷ giá (VND)</th></tr>
+    </table>
+    
+    <!-- Hiển thị thời gian cập nhật cuối cùng -->
+    <div>
+        ⏰ Cập nhật lần cuối: <span id="lastUpdate">-</span>
+    </div>
+    
+    <!-- Hiển thị lỗi nếu có -->
+    <div id="error"></div>
+
+    <script>
+        // Tải dữ liệu ngay khi trang mở
+        loadRate();
+        
+        // Cập nhật tự động mỗi 10 phút
+        // 600000 ms = 10 phút
+        // setInterval(hàm, ms) = chạy hàm liên tục
+        setInterval(loadRate, 600000);
+
+        // ========== FUNCTION: LOADRATE ==========
+        // Tác dụng: Lấy tỷ giá từ server (rates.php)
+        function loadRate() {
+            // Xóa lỗi cũ
+            document.getElementById("error").innerHTML = "";
+            
+            // Fetch đến rates.php (GET request)
+            fetch("rates.php")
+                // res.json() = chuyển response thành JSON
+                .then(res => res.json())
+                // data = mảng tỷ giá từ server
+                .then(data => {
+                    // Kiểm tra dữ liệu hợp lệ
+                    if (!Array.isArray(data) || data.length === 0) {
+                        throw new Error("Không có dữ liệu");
+                    }
+                    // Gọi hàm hiển thị
+                    showTable(data);
+                    // Cập nhật thời gian
+                    updateTime();
+                })
+                // Nếu có lỗi, hiển thị thông báo
+                .catch(err => {
+                    document.getElementById("error").innerHTML = 
+                        `<div class="error">❌ Lỗi: ${err.message}</div>`;
+                    console.error(err);
+                });
+        }
+
+        // ========== FUNCTION: SHOWTABLE ==========
+        // Tác dụng: Hiển thị bảng tỷ giá
+        function showTable(data) {
+            // Bắt đầu với header
+            let html = "<tr><th>Tiền tệ</th><th>Tỷ giá (VND)</th></tr>";
+            
+            // data.forEach() = duyệt qua từng tỷ giá
+            // r = từng item (có currency và rate)
+            data.forEach(r => {
+                // Format số: 26000 -> 26.000
+                let formatted = new Intl.NumberFormat('vi-VN').format(r.rate);
+                html += `<tr><td><strong>${r.currency}</strong></td><td>${formatted} ₫</td></tr>`;
+            });
+            
+            // Đổ HTML vào bảng
+            document.getElementById("tbl").innerHTML = html;
+        }
+
+        // ========== FUNCTION: UPDATETIME ==========
+        // Tác dụng: Cập nhật thời gian
+        function updateTime() {
+            // new Date() = lấy thời gian hiện tại
+            // toLocaleString('vi-VN') = format theo Việt Nam
+            let now = new Date().toLocaleString('vi-VN');
+            document.getElementById("lastUpdate").textContent = now;
+        }
+    </script>
+</body>
+</html>
+</html>
