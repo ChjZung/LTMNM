@@ -1,51 +1,29 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
-    <meta charset="UTF-8">
-    <title>@yield('title', 'Lab 01')</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-
-        th,
-        td {
-            border: 1px solid #ddd;
-            padding: 8px;
-        }
-
-        th {
-            background: #f3f4f6;
-            text-align: left;
-        }
-
-        .adult {
-            font-weight: 600;
-        }
-    </style>
+<meta charset="utf-8">
+<title>@yield('title','Articles')</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+.container { max-width: 960px; margin: 24px auto; }
+.flash { padding: 10px; margin-bottom: 12px; background: #ECFDF5; color:#065F46; border-radius:8px; }
+nav a { margin-right: 8px; }
+table { border-collapse: collapse; width: 100%; }
+th, td { border: 1px solid #e5e7eb; padding: 8px; text-align: left; }
+th { background: #f3f4f6; }
+</style>
+@stack('styles')
 </head>
-
 <body>
-    <header>
-        <h1>Laravel 12 – Lab 01</h1>
-        <nav>
-            <a href="/hello">Hello</a> |
-            <a href="/students">Students</a> |
-
-            <a href="/time">Time</a>
-        </nav>
-        <hr>
-    </header>
-    <main>
-        @yield('content')
-    </main>
-    <footer>
-        <hr>
-        <small>&copy; HUIT – Khoa CNTT</small>
-    </footer>
+@include('partials.nav')
+<div class="container">
+@if(session('success'))
+<div class="flash">{{ session('success') }}</div>
+@endif
+@yield('content')
+</div>
+@include('partials.footer')
+@stack('scripts')
 </body>
-
 </html>

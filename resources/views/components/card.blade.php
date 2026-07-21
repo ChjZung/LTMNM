@@ -1,23 +1,10 @@
-@props(['title'])
+@props(['title' => 'Thông tin'])
 
-<div style="
-    background:#fff;
-    border-radius:15px;
-    box-shadow:0 5px 15px rgba(0,0,0,.12);
-    margin-bottom:20px;
-    overflow:hidden;
-">
-
-    <div style="
-        background:linear-gradient(135deg,#2563EB,#06B6D4);
-        color:white;
-        padding:15px 20px;
-    ">
-        <h3 style="margin:0;">{{ $title }}</h3>
+<div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-top: 16px; overflow: hidden;">
+    <div style="background: #f8fafc; padding: 12px 16px; border-bottom: 1px solid #e2e8f0; font-weight: 600; color: #1e293b; font-size: 16px;">
+        {{ $title }}
     </div>
-
-    <div style="padding:20px;">
+    <div style="padding: 16px; color: #334155; line-height: 1.5;">
         {{ $slot }}
     </div>
-
 </div>
